@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#080b0a">
-<meta name="description" content="معاملات خيبر — متجر شدّات PUBG Mobile. اختر باقتك وتواصل عبر روبيكا.">
+<meta name="description" content="معاملات خيبر — متجر PUBG Mobile وFree Fire. اختر باقتك وتواصل عبر روبيكا.">
 <title>معاملات خيبر | متجر شدّات PUBG Mobile</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -16,6 +16,9 @@
 <div class="ornament">✦ بِسْمِ الله ✦</div>
 <section id="packs"><div class="sectionhead"><div><h2>باقات الشدّات</h2><p>اختر الباقة ثم جهّز رسالة الطلب — الأسعار بالريال الإيراني.</p></div><span class="pill">PUBG MOBILE</span></div><div class="grid" id="productGrid"></div></section>
 <section class="calligraphy-panel"><div class="thuluth">عليٌّ عليه السلام</div><p>زخرفة خطّية مستوحاة من الخط العربي التقليدي</p></section>
+
+<section id="freefire" style="margin-top:42px"><div class="sectionhead"><div><h2>جواهر فري فاير</h2><p>اختار باقة الجواهر، واكتب Player ID عند تجهيز الطلب.</p></div><span class="pill">FREE FIRE</span></div><div class="grid" id="diamondGrid"></div></section>
+<section id="specialpacks" style="margin-top:42px"><div class="sectionhead"><div><h2>عروض PUBG Mobile الخاصة</h2><p>عروض إضافية إلى جانب باقات الشدّات المعتادة.</p></div><span class="pill">SPECIAL PACKS</span></div><div class="grid" id="specialGrid"></div></section>
 <section id="how"><div class="sectionhead"><div><h2>شلون تطلب؟</h2><p>خطوات واضحة قبل إرسال الطلب.</p></div></div><div class="steps"><div class="stepcard"><div class="stepnum">١</div><div><b>اختار الباقة</b><p>اضغط على الباقة المناسبة وشوف المبلغ ورقم الطلب.</p></div></div><div class="stepcard"><div class="stepnum">٢</div><div><b>أكمل التحويل</b><p>استخدم بيانات الدفع التي يزوّدك بها البائع مباشرة، وتأكد من المبلغ قبل التحويل.</p></div></div><div class="stepcard"><div class="stepnum">٣</div><div><b>أرسل التفاصيل</b><p>جهّز رسالة الطلب وافتح روبيكا لإرسالها مع إيصال الدفع. لا ترسل كلمة مرور حساب اللعبة.</p></div></div></div></section>
 </main>
 <footer class="footer" id="contact"><div class="wrap"><div class="footerrow"><div><div class="brand-name">معاملات خيبر</div><div>أمانة • وضوح • تواصل</div></div><div>روبيكا: <a class="rubika" href="https://rubika.ir/Karar_ha28" target="_blank" rel="noopener">@Karar_ha28</a></div></div><div class="note">تنبيه: الموقع واجهة طلب ثابتة وليست بوابة دفع إلكترونية؛ لا يتم تأكيد الدفع أو شحن UC تلقائياً. تحقّق من بيانات الدفع مع البائع قبل التحويل. صورة الواجهة عمل فني رمزي مولّد وليست صورة توثيقية تاريخية.</div></div>
@@ -45,12 +48,30 @@ const products=[
  {uc:1800,base:63260000},
  {uc:3850,base:124740000},
  {uc:8100,base:252450000}
+ ];
+// أسعار Free Fire من صفحة ZEOS SHOP (تومان × 10 = ريال) مع ربح 800,000 ريال لكل منتج.
+const diamonds=[
+ {label:'110 جوهرة',base:2290000,category:'Free Fire'},
+ {label:'220 جوهرة',base:4620000,category:'Free Fire'},
+ {label:'330 جوهرة',base:6900000,category:'Free Fire'},
+ {label:'Level Up Pass — Full Pack',base:8990000,category:'Free Fire'},
+ {label:'550 جوهرة',base:12200000,category:'Free Fire'},
+ {label:'1040 جوهرة',base:22500000,category:'Free Fire'},
+ {label:'2000 جوهرة',base:46000000,category:'Free Fire'},
+ {label:'5000 جوهرة',base:85000000,category:'Free Fire'}
 ];
+// أسعار هذين العرضين تحتاج تأكيداً من المورد قبل استقبال طلبات فعلية.
+const specialPacks=[
+ {label:'First Purchase Pack',base:2970000,category:'PUBG Mobile',estimated:true},
+ {label:'Mythic Emblem Pack',base:14850000,category:'PUBG Mobile',estimated:true}
+];
+const allProducts=[...products,...diamonds,...specialPacks];
 let selected=null,orderId='';
 const fmt=n=>new Intl.NumberFormat('en-US').format(n);
 function packIcon(){return `<svg viewBox="0 0 100 85" fill="none" aria-hidden="true"><path d="M15 28 50 10 86 27 51 46 15 28Z" fill="#6f552e" stroke="#e6c77f" stroke-width="2"/><path d="M15 28 15 57 51 76 51 46 15 28Z" fill="#2a2920" stroke="#c7a15a" stroke-width="2"/><path d="M51 46 86 27 86 56 51 76 51 46Z" fill="#4b3b24" stroke="#e6c77f" stroke-width="2"/><path d="M31 20 65 37M31 36 31 57M69 38 69 59" stroke="#f2d997" stroke-width="2"/><rect x="39" y="42" width="25" height="17" rx="3" transform="rotate(0 39 42)" fill="#d8b36b" stroke="#fff0bd"/><text x="51" y="54" text-anchor="middle" font-size="11" font-weight="900" fill="#17140c">UC</text><path d="M8 60 16 56 24 61 16 66 8 60ZM76 68 84 64 92 69 84 74 76 68Z" fill="#b78c48" stroke="#f1d38b"/></svg>`}
-function render(){document.getElementById('productGrid').innerHTML=products.map((p,i)=>`<article class="card"><div class="pack-icon">${packIcon()}</div><div class="packname">${p.uc} UC</div><div class="packdesc">شدّات PUBG Mobile</div>${p.estimated?'<span class="badge">سعر تقديري</span>':''}<div class="price">${fmt(p.base+PROFIT)}</div><div class="currency">ريال إيراني</div><button class="btn" onclick="startOrder(${i})">اختيار الباقة</button></article>`).join('')}
-function startOrder(i){selected=products[i];orderId='KHK-'+Date.now().toString().slice(-8);document.getElementById('chosenPack').textContent=selected.uc+' UC';document.getElementById('chosenPrice').textContent=fmt(selected.base+PROFIT)+' ريال';document.getElementById('amountText').textContent=fmt(selected.base+PROFIT)+' ريال إيراني';document.getElementById('orderNumber').textContent=orderId;document.getElementById('playerId').value='';document.getElementById('buyerName').value='';document.getElementById('paidCheck').checked=false;document.getElementById('checkout').classList.add('show')}
+function extraCardHTML(p,index){return `<article class="card"><div class="pack-icon">${packIcon()}</div><div class="packname">${p.label}</div><div class="packdesc">${p.category}</div>${p.estimated?'<span class="badge">سعر يحتاج تأكيد المورد</span>':''}<div class="price">${fmt(p.base+PROFIT)}</div><div class="currency">ريال إيراني</div><button class="btn" onclick="startOrder(${index})">اختيار المنتج</button></article>`}
+function render(){document.getElementById('productGrid').innerHTML=products.map((p,i)=>`<article class="card"><div class="pack-icon">${packIcon()}</div><div class="packname">${p.uc} UC</div><div class="packdesc">شدّات PUBG Mobile</div>${p.estimated?'<span class="badge">سعر تقديري</span>':''}<div class="price">${fmt(p.base+PROFIT)}</div><div class="currency">ريال إيراني</div><button class="btn" onclick="startOrder(${i})">اختيار الباقة</button></article>`).join('');document.getElementById('diamondGrid').innerHTML=diamonds.map((p,i)=>extraCardHTML(p,products.length+i)).join('');document.getElementById('specialGrid').innerHTML=specialPacks.map((p,i)=>extraCardHTML(p,products.length+diamonds.length+i)).join('')}
+function startOrder(i){selected=allProducts[i];orderId='KHK-'+Date.now().toString().slice(-8);document.getElementById('chosenPack').textContent=selected.uc?selected.uc+' UC':selected.label;document.getElementById('chosenPrice').textContent=fmt(selected.base+PROFIT)+' ريال';document.getElementById('amountText').textContent=fmt(selected.base+PROFIT)+' ريال إيراني';document.getElementById('orderNumber').textContent=orderId;document.getElementById('playerId').value='';document.getElementById('buyerName').value='';document.getElementById('paidCheck').checked=false;document.getElementById('checkout').classList.add('show')}
 function closeModal(){document.getElementById('checkout').classList.remove('show')}
 function notify(s){const t=document.getElementById('toast');t.textContent=s;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600)}
 async function copyText(text,message){try{await navigator.clipboard.writeText(text);notify(message)}catch(e){window.prompt('انسخ النص:',text)}}
@@ -59,6 +80,6 @@ function openAccount(){document.getElementById('accountModal').classList.add('sh
 function closeAccount(){document.getElementById('accountModal').classList.remove('show')}
 function saveAccount(){const name=document.getElementById('accountName').value.trim(),contact=document.getElementById('accountContact').value.trim(),password=document.getElementById('accountPassword').value;if(!name||!contact||!password){notify('املأ الحقول كلها');return}try{localStorage.setItem('khaybarDemoAccount',JSON.stringify({name,contact,password}));notify('حُفظ الحساب على هذا المتصفح فقط')}catch(e){notify('تعذر الحفظ على هذا المتصفح')}}
 function renderAccount(){try{const a=JSON.parse(localStorage.getItem('khaybarDemoAccount')||'null');if(a){document.getElementById('accountName').value=a.name||'';document.getElementById('accountContact').value=a.contact||'';document.getElementById('accountPassword').value=a.password||''}const orders=JSON.parse(localStorage.getItem('khaybarOrders')||'[]');document.getElementById('orderHistory').innerHTML=orders.length?orders.slice().reverse().map(o=>`<div style="border-top:1px solid #514125;padding:8px 0"><b>${o.id}</b> — ${o.pack} — ${o.amount} ريال<br><span>Player ID: ${o.pid} · ${o.status}</span></div>`).join(''):'لا توجد طلبات محفوظة بعد.'}catch(e){}}
-async function makeOrder(){const pid=document.getElementById('playerId').value.trim(),buyer=document.getElementById('buyerName').value.trim();if(!pid){notify('اكتب Player ID أولاً');document.getElementById('playerId').focus();return}if(!buyer){notify('اكتب اسم الحساب أولاً');document.getElementById('buyerName').focus();return}if(!document.getElementById('paidCheck').checked){notify('أكّد إتمام التحويل أولاً');return}const total=selected.base+PROFIT;const msg=`طلب جديد — معاملات خيبر\nرقم الطلب: ${orderId}\nالباقة: ${selected.uc} UC PUBG Mobile\nالمبلغ: ${fmt(total)} ريال إيراني\nصاحب البطاقة: كرار بوعذار\nرقم البطاقة: 6219861884616649\nاسم الحساب: ${buyer}\nPlayer ID: ${pid}\nحالة الدفع: بانتظار التحقق اليدوي\nسأرفق إيصال التحويل في المحادثة.`;try{const orders=JSON.parse(localStorage.getItem('khaybarOrders')||'[]');orders.push({id:orderId,pack:selected.uc+' UC',amount:fmt(total),pid,status:'بانتظار التحقق'});localStorage.setItem('khaybarOrders',JSON.stringify(orders));}catch(e){}try{await navigator.clipboard.writeText(msg);notify('تم نسخ إيصال الطلب؛ أرفق صورة التحويل في روبيكا')}catch(e){window.prompt('انسخ إيصال الطلب:',msg)}setTimeout(()=>window.open(RUBIKA_URL,'_blank','noopener'),500)}
+async function makeOrder(){const pid=document.getElementById('playerId').value.trim(),buyer=document.getElementById('buyerName').value.trim();if(!pid){notify('اكتب Player ID أولاً');document.getElementById('playerId').focus();return}if(!buyer){notify('اكتب اسم الحساب أولاً');document.getElementById('buyerName').focus();return}if(!document.getElementById('paidCheck').checked){notify('أكّد إتمام التحويل أولاً');return}const total=selected.base+PROFIT;const productName=selected.uc?selected.uc+' UC PUBG Mobile':selected.label+' ('+selected.category+')';const msg=`طلب جديد — معاملات خيبر\nرقم الطلب: ${orderId}\nالمنتج: ${productName}\nالمبلغ: ${fmt(total)} ريال إيراني\nصاحب البطاقة: كرار بوعذار\nرقم البطاقة: 6219861884616649\nاسم الحساب: ${buyer}\nPlayer ID: ${pid}\nحالة الدفع: بانتظار التحقق اليدوي\nسأرفق إيصال التحويل في المحادثة.`;try{const orders=JSON.parse(localStorage.getItem('khaybarOrders')||'[]');orders.push({id:orderId,pack:selected.uc?selected.uc+' UC':selected.label,amount:fmt(total),pid,status:'بانتظار التحقق'});localStorage.setItem('khaybarOrders',JSON.stringify(orders));}catch(e){}try{await navigator.clipboard.writeText(msg);notify('تم نسخ إيصال الطلب؛ أرفق صورة التحويل في روبيكا')}catch(e){window.prompt('انسخ إيصال الطلب:',msg)}setTimeout(()=>window.open(RUBIKA_URL,'_blank','noopener'),500)}
 document.getElementById('checkout').addEventListener('click',e=>{if(e.target.id==='checkout')closeModal()});render();
 </script></body></html>
